@@ -16,25 +16,21 @@ class HandlerContent {
             return res.status(500).json({ err: "massage is Empty" });
         }
         try {
-            console.log(videoUrl);
             const Oemb = await (0, oembeb_1.getVideoDetails)(videoUrl);
-            console.log(Oemb);
-            const ownerId = req.body.id;
+            // console.log(Oemb);
+            const ownerId = req.payload.id;
+            // console.log(ownerId);
             const contentVal = {
                 videoUrl,
                 comment,
                 rating,
                 ownerId,
-                Oemb,
             };
             const created = await this.repo.createContent({
                 ...contentVal,
-                videoTitle: Oemb.videoTitle,
-                thumbnailUrl: Oemb.thumbnailUrl,
-                creatorName: Oemb.creatorName,
-                creatorUrl: Oemb.creatorUrl,
+                ...Oemb,
             });
-            return res.status(200).json(created).end();
+            return res.status(200).json({ created, ownerId: undefined }).end();
         }
         catch (err) {
             console.error(err);
@@ -46,7 +42,7 @@ class HandlerContent {
     async getPostContents(_, res) {
         try {
             const getContents = this.repo.getContents();
-            return res.status(200).json(getContents).end();
+            return res.status(200).json({ data: getContents }).end();
         }
         catch (err) {
             console.error(err);
@@ -57,8 +53,14 @@ class HandlerContent {
         }
     }
     async getPostContentById(req, res) {
+        const id = Number(req.params.id);
+        if (isNaN(id)) {
+            return res
+                .status(500)
+                .json({ err: `Not Found post number ${req.params.id}` });
+        }
         try {
-            const getContentId = this.repo.getContentById(req.body);
+            const getContentId = this.repo.getContentById(id);
             return res.status(200).json(getContentId).end();
         }
         catch (err) {
@@ -67,6 +69,39 @@ class HandlerContent {
                 .status(500)
                 .json({ err: `Cannot get content err : ${err}` })
                 .end();
+        }
+    }
+    async updatePostContentById(req, res) {
+        const id = Number(req.params.id);
+        if (isNaN(id)) {
+            return res
+                .status(400)
+                .json({ err: `not found ${id}` })
+                .end();
+        }
+        const { comment, rating } = req.body;
+        if (!comment && !rating) {
+            return res.status(500).json({ err: `Can update ` }).end();
+        }
+        if (rating > 5 || rating < 0) {
+            return res
+                .status(500)
+                .json({ err: "Rating is not over 5 and lower 0" })
+                .end();
+        }
+        try {
+            const updateContent = await this.repo.updateContentById({
+                id,
+                ownerId: req.payload.id,
+                comment,
+                rating,
+            });
+            return res.status(200).json(`Update Done : ${updateContent}`).end();
+        }
+        catch (err) {
+            return res
+                .status(500)
+                .json({ err: `Cannot update Conetent error code's : ${err}` });
         }
     }
 }

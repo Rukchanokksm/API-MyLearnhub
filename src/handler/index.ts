@@ -1,4 +1,5 @@
 import { Request } from "express";
+import { JwtAuthReq } from "../auth/jwt";
 
 export interface Addrequest<Params, Body> extends Request<Params, any, Body> {}
 
@@ -8,8 +9,11 @@ export interface ReqUser {
     password: string;
 }
 
+export interface ReqId {
+    id: number;
+}
+
 export interface ReqContent {
-    [x: string]: any;
     videoUrl: string;
     comment: string;
     rating: number;
@@ -23,6 +27,12 @@ export interface IHandlerUser {
 }
 
 export interface IHandlerContent {
-    createContentByid(req: Request, res: Response): Promise<Response>;
-    getPostContents(req: Request, res: Response): Promise<Response>;
+    createContentByid(
+        req: JwtAuthReq<Empty, ReqContent>,
+        res: Response,
+    ): Promise<Response>;
+    getPostContents(
+        req: JwtAuthReq<Request, any>,
+        res: Response,
+    ): Promise<Response>;
 }

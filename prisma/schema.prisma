@@ -15,7 +15,7 @@ model user {
   username String @unique
   name String
   password String
-  registedAt DateTime @default(now())
+  registeredAt DateTime @default(now())
   contents content[]
 }
 
@@ -29,6 +29,7 @@ model content {
   creatorName String
   creatorUrl String
   createdAt DateTime @default(now())
-  owner   user @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  updatedAt DateTime @default(now())
+  postedBy   user @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   ownerId String
 }

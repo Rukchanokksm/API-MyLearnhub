@@ -16,24 +16,20 @@ class RepositoryContent implements IRepositoryContent {
     async createContent(arg: ICreateContent): Promise<IContent> {
         return await this.db.content.create({
             include: {
-                owner: {
+                postedBy: {
                     select: {
                         id: true,
                         username: true,
+                        password: false,
                         name: true,
-                        registedAt: true,
+                        registeredAt: true,
                     },
                 },
             },
             data: {
-                comment: arg.comment,
-                videoTitle: arg.videoTitle,
-                videoUrl: arg.videoUrl,
-                thumbnailUrl: arg.thumbnailUrl,
-                creatorName: arg.creatorName,
-                creatorUrl: arg.creatorUrl,
-                rating: arg.rating,
-                owner: {
+                ...arg,
+                ownerId: undefined,
+                postedBy: {
                     connect: {
                         id: arg.ownerId,
                     },
@@ -42,8 +38,8 @@ class RepositoryContent implements IRepositoryContent {
         });
     }
 
-    async getContentById(id: number): Promise<IContent> {
-        return await this.db.content.findUniqueOrThrow({
+    async getContentById(id: number): Promise<IContent | null> {
+        return await this.db.content.findUnique({
             where: {
                 id,
             },
@@ -51,13 +47,34 @@ class RepositoryContent implements IRepositoryContent {
     }
 
     async getContents(): Promise<IContent[]> {
-        return await this.db.content.findMany({});
+        return await this.db.content.findMany({
+            include: {
+                postedBy: {
+                    select: {
+                        id: true,
+                        username: true,
+                        password: false,
+                        name: true,
+                        registeredAt: true,
+                    },
+                },
+            },
+        });
     }
 
     async updateContentById(arg: IUpdateContent): Promise<IContent> {
+        const post = await this.db.content.findUnique({
+            where: { id: arg.id },
+        });
+        if (!post) {
+            return Promise.reject(`no such post ${post}`);
+        }
+        if (post.ownerId !== arg.ownerId) {
+            return Promise.reject(`You are not owner this post!!`);
+        }
         return await this.db.content.update({
             where: {
-                id: arg.ownerId,
+                id: arg.id,
             },
             data: {
                 comment: arg.comment,

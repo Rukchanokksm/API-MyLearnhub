@@ -5,13 +5,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const client_1 = require("@prisma/client");
 const express_1 = __importDefault(require("express"));
+const cors_1 = __importDefault(require("cors"));
 const user_1 = require("./repository/user");
 const user_2 = require("./handler/user");
 const content_1 = require("./repository/content");
 const content_2 = require("./handler/content");
+const redis_1 = require("redis");
+const jwt_1 = require("./auth/jwt");
+const backlist_1 = require("./repository/backlist");
 async function main() {
     const db = new client_1.PrismaClient();
+    const redis = (0, redis_1.createClient)();
     try {
+        redis.connect();
         db.$connect();
     }
     catch (err) {
@@ -19,25 +25,44 @@ async function main() {
         return;
     }
     const repoUser = (0, user_1.newRepository)(db);
-    const HandlerUser = (0, user_2.newHandlerUser)(repoUser);
+    const repoBlacklist = (0, backlist_1.newRepositoryBlacklist)(redis);
+    const HandlerUser = (0, user_2.newHandlerUser)(repoUser, repoBlacklist);
     const repoContent = (0, content_1.newRepositoryContent)(db);
     const HandlerContent = (0, content_2.newHandlerContent)(repoContent);
+    const handlerMiddlerWare = new jwt_1.HandlerMiddleware(repoBlacklist);
     const port = process.env.PORT || 8000;
     const server = (0, express_1.default)();
     const userRouter = express_1.default.Router();
-    const postRouter = express_1.default.Router();
+    const contentRouter = express_1.default.Router();
+    const auth = express_1.default.Router();
+    server.use((0, cors_1.default)());
     server.use(express_1.default.json());
+    server.use("/auth", auth);
     server.use("/user", userRouter);
-    server.use("/post", postRouter);
+    server.use("/content", contentRouter);
     //check sever status
     server.get("/", (_, res) => {
         return res.status(200).json({ status: " ok " }).end();
     });
+    //Get Content
     //User API
-    userRouter.post("/register", HandlerUser.register.bind(HandlerUser));
-    userRouter.post("/login", HandlerUser.login.bind(HandlerUser));
+    // postRouter.use(HandlerMiddlerWare.jwtMiddleware.bind(HandlerMiddlerWare));
+    //Register
+    userRouter.post("/", HandlerUser.register.bind(HandlerUser));
+    auth.post("/login", HandlerUser.login.bind(HandlerUser));
+    auth.get("/me", handlerMiddlerWare.jwtMiddleware.bind(handlerMiddlerWare), HandlerUser.getloginUser.bind(HandlerUser));
+    userRouter.get("/logout", handlerMiddlerWare.jwtMiddleware.bind(handlerMiddlerWare), HandlerUser.logout.bind(HandlerUser));
     //Create Post
-    userRouter.post("/post", HandlerContent.createContentByid.bind(HandlerContent));
+    contentRouter.post("/", handlerMiddlerWare.jwtMiddleware.bind(handlerMiddlerWare), HandlerContent.createContentByid.bind(HandlerContent));
+    //Get content by id
+    contentRouter.get("/:id", handlerMiddlerWare.jwtMiddleware.bind(handlerMiddlerWare), HandlerContent.getPostContentById.bind(HandlerContent));
+    contentRouter.get("/", HandlerContent.getPostContents.bind(HandlerContent));
+    //update Post
+    //check path
+    contentRouter.patch("/update/", (_, res) => {
+        return res.status(500).json({ err: "Can't Get path" }).end();
+    });
+    contentRouter.patch("/update/:id", handlerMiddlerWare.jwtMiddleware.bind(handlerMiddlerWare), HandlerContent.updatePostContentById.bind(HandlerContent));
     server.listen(port, () => {
         console.log(`server is listening posrt ${port}`);
     });

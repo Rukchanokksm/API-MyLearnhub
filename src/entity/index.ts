@@ -7,8 +7,9 @@ export interface ICreateuser {
 export interface Iuser {
     id: string;
     username: string;
+    name: string;
     password: string;
-    registed?: number;
+    registeredAt: any;
 }
 
 export interface ICreateContent {
@@ -22,16 +23,13 @@ export interface ICreateContent {
     creatorUrl: string;
 }
 
-export interface IContent {
+export interface IContent extends ICreateContent {
     id: number;
-    videoUrl: string;
-    comment: string;
-    rating: number;
-    ownerId: string;
 }
 
 export interface IUpdateContent {
-    ownerId: number;
-    comment: string;
-    rating: number;
+    id: number;
+    ownerId: string;
+    comment?: string;
+    rating?: number;
 }
