@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { ICreateuser, Iuser } from "../entity";
+import { ICreateuser, IUser } from "../entity";
 import { IRepositoryUser } from ".";
 
 export function newRepository(db: PrismaClient): IRepositoryUser {
@@ -12,13 +12,13 @@ class RepositoryUser implements IRepositoryUser {
         this.db = db;
     }
 
-    async createUser(user: ICreateuser): Promise<Iuser> {
+    async createUser(user: ICreateuser): Promise<IUser> {
         return await this.db.user.create({
             data: user,
         });
     }
 
-    async getUser(username: string): Promise<Iuser | null> {
+    async getUser(username: string): Promise<IUser | null> {
         return await this.db.user
             .findUnique({
                 where: {

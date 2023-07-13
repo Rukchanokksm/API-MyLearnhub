@@ -48,6 +48,9 @@ class RepositoryContent implements IRepositoryContent {
 
     async getContents(): Promise<IContent[]> {
         return await this.db.content.findMany({
+            where: {
+                id: undefined,
+            },
             include: {
                 postedBy: {
                     select: {

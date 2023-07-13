@@ -42,6 +42,9 @@ class RepositoryContent {
     }
     async getContents() {
         return await this.db.content.findMany({
+            where: {
+                ownerId: undefined,
+            },
             include: {
                 postedBy: {
                     select: {

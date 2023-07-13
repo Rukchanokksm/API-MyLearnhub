@@ -21,7 +21,6 @@ class HandlerContent {
             const ownerId = req.payload.id;
             // console.log(ownerId);
             const contentVal = {
-                videoUrl,
                 comment,
                 rating,
                 ownerId,
@@ -30,7 +29,10 @@ class HandlerContent {
                 ...contentVal,
                 ...Oemb,
             });
-            return res.status(200).json({ created, ownerId: undefined }).end();
+            return res
+                .status(201)
+                .json({ ...created, ownerId: undefined })
+                .end();
         }
         catch (err) {
             console.error(err);
@@ -41,8 +43,11 @@ class HandlerContent {
     }
     async getPostContents(_, res) {
         try {
-            const getContents = this.repo.getContents();
-            return res.status(200).json({ data: getContents }).end();
+            const getContents = await this.repo.getContents();
+            return res
+                .status(200)
+                .json({ data: { ...getContents, ownerId: undefined } })
+                .end();
         }
         catch (err) {
             console.error(err);
@@ -60,7 +65,7 @@ class HandlerContent {
                 .json({ err: `Not Found post number ${req.params.id}` });
         }
         try {
-            const getContentId = this.repo.getContentById(id);
+            const getContentId = await this.repo.getContentById(id);
             return res.status(200).json(getContentId).end();
         }
         catch (err) {

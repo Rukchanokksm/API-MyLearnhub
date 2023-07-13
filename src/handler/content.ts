@@ -4,6 +4,7 @@ import { IRepositoryContent } from "../repository";
 import { Request, Response } from "express";
 import { getVideoDetails } from "../service/oembeb";
 import { JwtAuthReq } from "../auth/jwt";
+import { IContent } from "../entity";
 
 interface IHandlerContent {
     createContentByid(
@@ -37,16 +38,18 @@ class HandlerContent implements IHandlerContent {
             const ownerId = req.payload.id;
             // console.log(ownerId);
             const contentVal = {
-                videoUrl,
                 comment,
                 rating,
                 ownerId,
             };
-            const created = await this.repo.createContent({
+            const created: IContent = await this.repo.createContent({
                 ...contentVal,
                 ...Oemb,
             });
-            return res.status(200).json(created.ownerId).end();
+            return res
+                .status(201)
+                .json({ ...created, ownerId: undefined })
+                .end();
         } catch (err) {
             console.error(err);
             return res
@@ -57,7 +60,7 @@ class HandlerContent implements IHandlerContent {
 
     async getPostContents(_: any, res: Response): Promise<Response> {
         try {
-            const getContents = this.repo.getContents();
+            const getContents = await this.repo.getContents();
             return res.status(200).json({ data: getContents }).end();
         } catch (err) {
             console.error(err);
@@ -79,7 +82,7 @@ class HandlerContent implements IHandlerContent {
                 .json({ err: `Not Found post number ${req.params.id}` });
         }
         try {
-            const getContentId = this.repo.getContentById(id);
+            const getContentId = await this.repo.getContentById(id);
             return res.status(200).json(getContentId).end();
         } catch (err) {
             console.error(err);

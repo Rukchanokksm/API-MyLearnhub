@@ -4,7 +4,7 @@ export interface ICreateuser {
     password: string;
 }
 
-export interface Iuser {
+export interface IUser {
     id: string;
     username: string;
     name: string;
@@ -13,7 +13,6 @@ export interface Iuser {
 }
 
 export interface ICreateContent {
-    ownerId: string;
     comment: string;
     rating: number;
     videoTitle: string;
@@ -21,6 +20,8 @@ export interface ICreateContent {
     thumbnailUrl: string;
     creatorName: string;
     creatorUrl: string;
+
+    ownerId: string;
 }
 
 export interface IContent extends ICreateContent {
