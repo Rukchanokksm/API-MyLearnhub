@@ -12,9 +12,17 @@ interface IHandlerContent {
         res: Response,
     ): Promise<Response>;
     getPostContents(req: Request, res: Response): Promise<Response>;
+    getPostContentById(
+        req: JwtAuthReq<ReqId, Empty>,
+        res: Response,
+    ): Promise<Response> 
+    updatePostContentById(
+        req: JwtAuthReq<ReqId, ReqContent>,
+        res: Response,
+    ): Promise<Response>;
 }
 
-export function newHandlerContent(repo: IRepositoryContent) {
+export function newHandlerContent(repo: IRepositoryContent): IHandlerContent {
     return new HandlerContent(repo);
 }
 
@@ -30,7 +38,7 @@ class HandlerContent implements IHandlerContent {
     ): Promise<Response> {
         const { videoUrl, comment, rating } = req.body;
         if (!videoUrl || !comment || !rating) {
-            return res.status(500).json({ err: "massage is Empty" });
+            return res.status(500).json({ err: "massage is Empty" }).end();
         }
         try {
             const Oemb = await getVideoDetails(videoUrl);
@@ -58,7 +66,7 @@ class HandlerContent implements IHandlerContent {
         }
     }
 
-    async getPostContents(_: any, res: Response): Promise<Response> {
+    async getPostContents(_, res: Response): Promise<Response> {
         try {
             const getContents = await this.repo.getContents();
             return res.status(200).json({ data: getContents }).end();

@@ -49,7 +49,7 @@ export class HandlerMiddleware {
                 accessToken,
             );
             if (isBlacklisted) {
-                return res.status(401).json({ status: `logged out` }).end();
+                return res.status(200).json({ status: `logged out` }).end();
             }
 
             const decoded = jwt.verify(accessToken, secret);

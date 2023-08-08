@@ -32,4 +32,18 @@ class RepositoryUser implements IRepositoryUser {
                 return Promise.resolve(user);
             });
     }
+
+    // async upDateUsername(id : string): Promise<IUser> {
+    //     try {
+    //         const username
+    //     }catch(err){
+    //         console.error(err)
+    //         return Promise.reject(`can't get user with error code ${err}`)
+    //     }
+    //      await this.db.user.findUnique({
+    //         where: {
+    //             id
+    //         }
+    //     })
+    // }
 }

@@ -14,8 +14,8 @@ async function main() {
     const redis = createClient();
 
     try {
-        redis.connect();
-        db.$connect();
+        await redis.connect();
+        await db.$connect();
     } catch (err) {
         console.error(err);
         return;
@@ -46,10 +46,7 @@ async function main() {
         return res.status(200).json({ status: " ok " }).end();
     });
 
-    //Get Content
-
     //User API
-    // postRouter.use(HandlerMiddlerWare.jwtMiddleware.bind(HandlerMiddlerWare));
     //Register
     userRouter.post("/", HandlerUser.register.bind(HandlerUser));
     auth.post("/login", HandlerUser.login.bind(HandlerUser));
@@ -64,7 +61,7 @@ async function main() {
         HandlerUser.logout.bind(HandlerUser),
     );
 
-    //Create Post
+    //Create contant
     contentRouter.post(
         "/",
         handlerMiddlerWare.jwtMiddleware.bind(handlerMiddlerWare),
@@ -74,7 +71,7 @@ async function main() {
     //Get content by id
     contentRouter.get(
         "/:id",
-        handlerMiddlerWare.jwtMiddleware.bind(handlerMiddlerWare),
+        // handlerMiddlerWare.jwtMiddleware.bind(handlerMiddlerWare),
         HandlerContent.getPostContentById.bind(HandlerContent),
     );
     contentRouter.get("/", HandlerContent.getPostContents.bind(HandlerContent));

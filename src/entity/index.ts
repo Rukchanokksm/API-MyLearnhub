@@ -20,8 +20,7 @@ export interface ICreateContent {
     thumbnailUrl: string;
     creatorName: string;
     creatorUrl: string;
-
-    ownerId: string;
+    ownerId?: string;
 }
 
 export interface IContent extends ICreateContent {
@@ -33,4 +32,9 @@ export interface IUpdateContent {
     ownerId: string;
     comment?: string;
     rating?: number;
+}
+
+export interface IUdateUserName {
+    id: string
+    name? : string
 }

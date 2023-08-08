@@ -17,8 +17,8 @@ async function main() {
     const db = new client_1.PrismaClient();
     const redis = (0, redis_1.createClient)();
     try {
-        redis.connect();
-        db.$connect();
+        await redis.connect();
+        await db.$connect();
     }
     catch (err) {
         console.error(err);
@@ -44,18 +44,18 @@ async function main() {
     server.get("/", (_, res) => {
         return res.status(200).json({ status: " ok " }).end();
     });
-    //Get Content
     //User API
-    // postRouter.use(HandlerMiddlerWare.jwtMiddleware.bind(HandlerMiddlerWare));
     //Register
     userRouter.post("/", HandlerUser.register.bind(HandlerUser));
     auth.post("/login", HandlerUser.login.bind(HandlerUser));
     auth.get("/me", handlerMiddlerWare.jwtMiddleware.bind(handlerMiddlerWare), HandlerUser.getloginUser.bind(HandlerUser));
     userRouter.get("/logout", handlerMiddlerWare.jwtMiddleware.bind(handlerMiddlerWare), HandlerUser.logout.bind(HandlerUser));
-    //Create Post
+    //Create contant
     contentRouter.post("/", handlerMiddlerWare.jwtMiddleware.bind(handlerMiddlerWare), HandlerContent.createContentByid.bind(HandlerContent));
     //Get content by id
-    contentRouter.get("/:id", handlerMiddlerWare.jwtMiddleware.bind(handlerMiddlerWare), HandlerContent.getPostContentById.bind(HandlerContent));
+    contentRouter.get("/:id", 
+    // handlerMiddlerWare.jwtMiddleware.bind(handlerMiddlerWare),
+    HandlerContent.getPostContentById.bind(HandlerContent));
     contentRouter.get("/", HandlerContent.getPostContents.bind(HandlerContent));
     //update Post
     //check path

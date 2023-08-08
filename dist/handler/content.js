@@ -13,7 +13,7 @@ class HandlerContent {
     async createContentByid(req, res) {
         const { videoUrl, comment, rating } = req.body;
         if (!videoUrl || !comment || !rating) {
-            return res.status(500).json({ err: "massage is Empty" });
+            return res.status(500).json({ err: "massage is Empty" }).end();
         }
         try {
             const Oemb = await (0, oembeb_1.getVideoDetails)(videoUrl);
@@ -44,10 +44,7 @@ class HandlerContent {
     async getPostContents(_, res) {
         try {
             const getContents = await this.repo.getContents();
-            return res
-                .status(200)
-                .json({ data: { ...getContents, ownerId: undefined } })
-                .end();
+            return res.status(200).json({ data: getContents }).end();
         }
         catch (err) {
             console.error(err);

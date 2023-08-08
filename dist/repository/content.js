@@ -35,6 +35,16 @@ class RepositoryContent {
     }
     async getContentById(id) {
         return await this.db.content.findUnique({
+            include: {
+                postedBy: {
+                    select: {
+                        id: true,
+                        username: true,
+                        name: true,
+                        registeredAt: true
+                    }
+                }
+            },
             where: {
                 id,
             },
@@ -42,9 +52,6 @@ class RepositoryContent {
     }
     async getContents() {
         return await this.db.content.findMany({
-            where: {
-                ownerId: undefined,
-            },
             include: {
                 postedBy: {
                     select: {

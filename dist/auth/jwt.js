@@ -31,7 +31,7 @@ class HandlerMiddleware {
             }
             const isBlacklisted = await this.repoBlacklist.isBlacklisted(accessToken);
             if (isBlacklisted) {
-                return res.status(401).json({ status: `logged out` }).end();
+                return res.status(200).json({ status: `logged out` }).end();
             }
             const decoded = jsonwebtoken_1.default.verify(accessToken, secret);
             const id = decoded["id"];

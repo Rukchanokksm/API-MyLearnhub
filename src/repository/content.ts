@@ -40,6 +40,16 @@ class RepositoryContent implements IRepositoryContent {
 
     async getContentById(id: number): Promise<IContent | null> {
         return await this.db.content.findUnique({
+            include: {
+                postedBy: {
+                    select: {
+                        id: true,
+                        username : true,
+                        name: true,
+                        registeredAt: true
+                    }
+                }
+            },
             where: {
                 id,
             },
@@ -48,9 +58,6 @@ class RepositoryContent implements IRepositoryContent {
 
     async getContents(): Promise<IContent[]> {
         return await this.db.content.findMany({
-            where: {
-                id: undefined,
-            },
             include: {
                 postedBy: {
                     select: {
