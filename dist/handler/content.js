@@ -106,5 +106,26 @@ class HandlerContent {
                 .json({ err: `Cannot update Conetent error code's : ${err}` });
         }
     }
+    async deleteContentById(req, res) {
+        const id = Number(req.params.id);
+        if (isNaN(id)) {
+            return res.status(401).json({ err: "Id is not a number" }).end();
+        }
+        try {
+            const owner = req.payload.id;
+            const getId = await this.repo.getContentById(id);
+            if (!getId?.ownerId) {
+                return res.status(400).json({ err: `Not found content id ${id}` }).end();
+            }
+            if (owner !== getId.ownerId) {
+                return res.status(500).json({ err: `Your not content onwer` }).end();
+            }
+            await this.repo.deleteContentById(id);
+            return res.status(200).json(`delete complete`).end();
+        }
+        catch (err) {
+            return res.status(500).json({ err: `Can't delete content id is ${id} with error code ${err}` }).end();
+        }
+    }
 }
 //# sourceMappingURL=content.js.map

@@ -1,4 +1,4 @@
-import { Addrequest, Empty, ReqUser } from ".";
+import { Addrequest, Empty, ReqUser } from "../auth/index";
 import { IRepositoryBlacklist, IRepositoryUser } from "../repository";
 import { Response } from "express";
 import { comparePassWord, hashPassWord } from "../auth/bcrytp";
@@ -17,7 +17,7 @@ export interface IHandlerUser {
 export function newHandlerUser(
     repo: IRepositoryUser,
     repoBlacklist: IRepositoryBlacklist,
-): IHandlerUser {
+) {
     return new HandlerUser(repo, repoBlacklist);
 }
 

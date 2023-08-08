@@ -1,11 +1,11 @@
 // import { IHandlerContent } from ".";
-import { Empty, ReqContent, ReqId } from ".";
+import { Empty, ReqContent, ReqId } from "../auth/index";
 import { IRepositoryContent } from "../repository";
 import { Request, Response } from "express";
 import { getVideoDetails } from "../service/oembeb";
 import { JwtAuthReq } from "../auth/jwt";
 import { IContent } from "../entity";
-
+import { ReqDeleteId } from ".";
 interface IHandlerContent {
     createContentByid(
         req: JwtAuthReq<Empty, ReqContent>,
@@ -20,9 +20,10 @@ interface IHandlerContent {
         req: JwtAuthReq<ReqId, ReqContent>,
         res: Response,
     ): Promise<Response>;
+    deleteContentById(req:JwtAuthReq<ReqId , Empty> , res :Response) : Promise<Response>
 }
 
-export function newHandlerContent(repo: IRepositoryContent): IHandlerContent {
+export function newHandlerContent(repo: IRepositoryContent) {
     return new HandlerContent(repo);
 }
 
@@ -129,11 +130,32 @@ class HandlerContent implements IHandlerContent {
                 comment,
                 rating,
             });
-            return res.status(200).json(`Update Done : ${updateContent}`).end();
+            return res.status(200).json({massage :`Update Done ${updateContent}`}).end();
         } catch (err) {
             return res
                 .status(500)
                 .json({ err: `Cannot update Conetent error code's : ${err}` });
+        }
+    }
+
+    async deleteContentById(req:JwtAuthReq<ReqDeleteId , Empty> , res :Response) : Promise<Response> {
+        const id = Number(req.params.id)
+        if(isNaN(id)) {
+            return res.status(401).json({err : "Id is not a number"}).end()
+        }
+        try{
+            const owner = req.payload.id
+            const getId = await this.repo.getContentById(id)
+        if(!getId?.ownerId){
+    return res.status(400).json({err : `Not found content id ${id}`}).end()
+}
+            if(owner !== getId.ownerId){
+                return res.status(500).json({err : `Your not content onwer`}).end()
+            }
+            await this.repo.deleteContentById(id)
+            return res.status(200).json({ massage : `delete complete`}).end()
+        }catch(err){
+            return res.status(500).json({err : `Can't delete content id is ${id} with error code ${err}`}).end()
         }
     }
 }

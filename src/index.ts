@@ -68,24 +68,26 @@ async function main() {
         HandlerContent.createContentByid.bind(HandlerContent),
     );
 
+    //get all content
+    contentRouter.get("/", HandlerContent.getPostContents.bind(HandlerContent));
     //Get content by id
     contentRouter.get(
         "/:id",
-        // handlerMiddlerWare.jwtMiddleware.bind(handlerMiddlerWare),
         HandlerContent.getPostContentById.bind(HandlerContent),
     );
-    contentRouter.get("/", HandlerContent.getPostContents.bind(HandlerContent));
 
-    //update Post
-    //check path
-    contentRouter.patch("/update/", (_, res) => {
-        return res.status(500).json({ err: "Can't Get path" }).end();
-    });
+    //update content
     contentRouter.patch(
         "/update/:id",
         handlerMiddlerWare.jwtMiddleware.bind(handlerMiddlerWare),
         HandlerContent.updatePostContentById.bind(HandlerContent),
     );
+    //delete content
+    contentRouter.delete(
+        "/delete/:id",
+        handlerMiddlerWare.jwtMiddleware.bind(handlerMiddlerWare),
+        HandlerContent.deleteContentById.bind(HandlerContent)
+    )
 
     server.listen(port, () => {
         console.log(`server is listening posrt ${port}`);
