@@ -98,7 +98,7 @@ class HandlerContent {
                 comment,
                 rating,
             });
-            return res.status(200).json(`Update Done : ${updateContent}`).end();
+            return res.status(200).json({ massage: `Update Done ${updateContent}` }).end();
         }
         catch (err) {
             return res
@@ -121,7 +121,7 @@ class HandlerContent {
                 return res.status(500).json({ err: `Your not content onwer` }).end();
             }
             await this.repo.deleteContentById(id);
-            return res.status(200).json(`delete complete`).end();
+            return res.status(200).json({ massage: `delete complete` }).end();
         }
         catch (err) {
             return res.status(500).json({ err: `Can't delete content id is ${id} with error code ${err}` }).end();

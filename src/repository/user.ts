@@ -1,8 +1,8 @@
 import { PrismaClient } from "@prisma/client";
-import { ICreateuser, IUser } from "../entity";
+import { ICreateuser, IUdateUserName, IUser } from "../entity";
 import { IRepositoryUser } from ".";
 
-export function newRepository(db: PrismaClient): IRepositoryUser {
+export function newRepository(db: PrismaClient) {
     return new RepositoryUser(db);
 }
 
@@ -33,17 +33,31 @@ class RepositoryUser implements IRepositoryUser {
             });
     }
 
-    // async upDateUsername(id : string): Promise<IUser> {
-    //     try {
-    //         const username
-    //     }catch(err){
-    //         console.error(err)
-    //         return Promise.reject(`can't get user with error code ${err}`)
-    //     }
-    //      await this.db.user.findUnique({
-    //         where: {
-    //             id
-    //         }
-    //     })
-    // }
+    async upDateUsername(arg: IUdateUserName): Promise<IUser> {
+        try {
+            const user = await this.db.user.findUnique({
+                where: {
+                    username: arg.username,
+                },
+            });
+            if (!user) {
+                return Promise.reject("Not found");
+            }
+            if (user.username !== arg.username) {
+                return Promise.reject("Not your name !");
+            }
+
+            return await this.db.user.update({
+                where: {
+                    id: user.username,
+                },
+                data: {
+                    name: arg.name,
+                },
+            });
+        } catch (err) {
+            console.error(err);
+            return Promise.reject(`Can Update name with error ${err}`);
+        }
+    }
 }

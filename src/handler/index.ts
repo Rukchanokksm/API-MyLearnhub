@@ -1,4 +1,9 @@
 export interface ReqDeleteId {
-    id : number
-    ownerId : string
+    id: number;
+    ownerId: string;
+}
+
+export interface ReqUpdateName {
+    name: string;
+    username: string;
 }

@@ -12,6 +12,12 @@ export interface IUser {
     registeredAt: any;
 }
 
+export interface IUpdateUser {
+    id: string;
+    username: string;
+    name: string;
+}
+
 export interface ICreateContent {
     comment: string;
     rating: number;
@@ -35,6 +41,6 @@ export interface IUpdateContent {
 }
 
 export interface IUdateUserName {
-    id: string
-    name? : string
+    username: string;
+    name?: string;
 }

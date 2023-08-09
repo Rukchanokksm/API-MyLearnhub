@@ -2,6 +2,7 @@ import {
     IContent,
     ICreateContent,
     ICreateuser,
+    IUdateUserName,
     IUpdateContent,
     IUser,
 } from "../entity";
@@ -17,6 +18,7 @@ export interface IRepositoryContent {
 export interface IRepositoryUser {
     createUser(user: ICreateuser): Promise<IUser>;
     getUser(username: string): Promise<IUser | null>;
+    upDateUsername(arg: IUdateUserName): Promise<IUser>;
 }
 
 export interface IRepositoryBlacklist {

@@ -18,10 +18,14 @@ export interface ReqContent {
     rating: number;
 }
 
+export interface ReqUpdateName {
+    name: string;
+    username: string;
+}
+
 export interface Empty {}
 
 export interface IHandlerUser {
     register(req: Addrequest<Empty, ReqUser>, res: Response): Promise<Response>;
     login(req: Addrequest<Empty, ReqUser>, res: Response): Promise<Response>;
 }
-

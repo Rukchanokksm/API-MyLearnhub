@@ -28,7 +28,7 @@ class HandlerUser {
             });
             return res
                 .status(201)
-                .json({ ...isRegis, password: undefined })
+                .json({ statusCode: 201, ...isRegis, password: undefined })
                 .end();
         }
         catch (err) {
@@ -45,17 +45,13 @@ class HandlerUser {
                 .json({ err: "missing username or password !" })
                 .end();
         }
-        return await this.repo
-            .getUser(username)
-            .then((user) => {
+        try {
+            const user = await this.repo.getUser(username);
             if (!user) {
-                return res.status(401).end();
+                return res.status(400).json({ statusCode: 400, massgae: 'User not found' }).end();
             }
             if (!(0, bcrytp_1.comparePassWord)(password, user.password)) {
-                return res
-                    .status(401)
-                    .json({ err: "ivalid username or password" })
-                    .end();
+                return res.status(402).json({ statusCode: 402, massage: 'password is wrong !!!' }).end();
             }
             const payload = {
                 id: user.id,
@@ -65,7 +61,7 @@ class HandlerUser {
             return res
                 .status(200)
                 .json({
-                // status: "login ok",
+                status: "login ok",
                 accessToken: token,
                 id: user.id,
                 username: user.username,
@@ -73,11 +69,10 @@ class HandlerUser {
                 registeredAt: user.registeredAt,
             })
                 .end();
-        })
-            .catch((err) => {
-            console.log(`failed to login ${err}`);
-            return res.status(500).end();
-        });
+        }
+        catch (err) {
+            return res.status(500).json({ status: 401, massage: err }).end();
+        }
     }
     async getloginUser(req, res) {
         const username = req.payload.username;
