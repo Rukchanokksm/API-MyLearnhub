@@ -60,7 +60,9 @@ async function main() {
         handlerMiddlerWare.jwtMiddleware.bind(handlerMiddlerWare),
         HandlerUser.logout.bind(HandlerUser),
     );
-
+    userRouter.patch("/update",
+    handlerMiddlerWare.jwtMiddleware.bind(handlerMiddlerWare),
+    HandlerUser.UpdateUsername.bind(HandlerUser))
     //Create contant
     contentRouter.post(
         "/",

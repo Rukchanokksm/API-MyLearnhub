@@ -19,37 +19,39 @@ class RepositoryUser implements IRepositoryUser {
     }
 
     async getUser(username: string): Promise<IUser | null> {
-        return await this.db.user
-            .findUnique({
-                where: {
+        try{
+             const user = await this.db.user.findUnique({
+                where:{
                     username,
-                },
-            })
-            .then((user) => {
-                if (!user) {
-                    return Promise.reject(`not found ${user}`);
                 }
-                return Promise.resolve(user);
-            });
+            })
+            if(!user){
+                return Promise.reject(`not found ${user}`);
+            }
+            return user;
+        }catch(err){
+            console.error(err)
+            return Promise.reject(`Can't get user with error ${err}`);
+        }
+        // return await this.db.user
+        //     .findUnique({
+        //         where: {
+        //             username,
+        //         },
+        //     })
+        //     .then((user) => {
+        //         if (!user) {
+        //             return Promise.reject(`not found ${user}`);
+        //         }
+        //         return Promise.resolve(user);
+        //     });
     }
 
     async upDateUsername(arg: IUdateUserName): Promise<IUser> {
         try {
-            const user = await this.db.user.findUnique({
-                where: {
-                    username: arg.username,
-                },
-            });
-            if (!user) {
-                return Promise.reject("Not found");
-            }
-            if (user.username !== arg.username) {
-                return Promise.reject("Not your name !");
-            }
-
             return await this.db.user.update({
                 where: {
-                    id: user.username,
+                    username:arg.username,
                 },
                 data: {
                     name: arg.name,

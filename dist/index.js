@@ -50,6 +50,7 @@ async function main() {
     auth.post("/login", HandlerUser.login.bind(HandlerUser));
     auth.get("/me", handlerMiddlerWare.jwtMiddleware.bind(handlerMiddlerWare), HandlerUser.getloginUser.bind(HandlerUser));
     userRouter.get("/logout", handlerMiddlerWare.jwtMiddleware.bind(handlerMiddlerWare), HandlerUser.logout.bind(HandlerUser));
+    userRouter.patch("/update", handlerMiddlerWare.jwtMiddleware.bind(handlerMiddlerWare), HandlerUser.UpdateUsername.bind(HandlerUser));
     //Create contant
     contentRouter.post("/", handlerMiddlerWare.jwtMiddleware.bind(handlerMiddlerWare), HandlerContent.createContentByid.bind(HandlerContent));
     //get all content

@@ -3,17 +3,8 @@ import { IRepositoryBlacklist, IRepositoryUser } from "../repository";
 import { Response } from "express";
 import { comparePassWord, hashPassWord } from "../auth/bcrytp";
 import { JwtAuthReq, newJwt, payload } from "../auth/jwt";
-import { ReqUpdateName } from ".";
+import { IHandlerUser, ReqUpdateName } from ".";
 
-export interface IHandlerUser {
-    register(req: Addrequest<Empty, ReqUser>, res: Response): Promise<Response>;
-    login(req: Addrequest<Empty, ReqUser>, res: Response): Promise<Response>;
-    logout(req: JwtAuthReq<Empty, Empty>, res: Response): Promise<Response>;
-    getloginUser(
-        req: JwtAuthReq<Empty, Empty>,
-        res: Response,
-    ): Promise<Response>;
-}
 
 export function newHandlerUser(
     repo: IRepositoryUser,
@@ -165,8 +156,8 @@ class HandlerUser implements IHandlerUser {
                 .json({ statusCode: 400, massage: "No user input to change !" })
                 .end();
         }
-        const UserName = req.payload.username;
-        if (!UserName) {
+        const userName = req.payload.username;
+        if (!userName) {
             return res
                 .status(402)
                 .json({ statusCode: 402, massage: "User not found !" })
@@ -174,7 +165,7 @@ class HandlerUser implements IHandlerUser {
         }
         try {
             await this.repo.upDateUsername({
-                username: UserName,
+                username: userName,
                 name: name,
             });
             return res

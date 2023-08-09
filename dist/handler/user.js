@@ -48,10 +48,16 @@ class HandlerUser {
         try {
             const user = await this.repo.getUser(username);
             if (!user) {
-                return res.status(400).json({ statusCode: 400, massgae: 'User not found' }).end();
+                return res
+                    .status(400)
+                    .json({ statusCode: 400, massgae: "User not found" })
+                    .end();
             }
             if (!(0, bcrytp_1.comparePassWord)(password, user.password)) {
-                return res.status(402).json({ statusCode: 402, massage: 'password is wrong !!!' }).end();
+                return res
+                    .status(402)
+                    .json({ statusCode: 402, massage: "password is wrong !!!" })
+                    .end();
             }
             const payload = {
                 id: user.id,
@@ -113,6 +119,39 @@ class HandlerUser {
             return res
                 .status(500)
                 .json({ error: `could not log out with token ${req.token}` })
+                .end();
+        }
+    }
+    async UpdateUsername(req, res) {
+        const { name } = req.body;
+        if (!name) {
+            return res
+                .status(400)
+                .json({ statusCode: 400, massage: "No user input to change !" })
+                .end();
+        }
+        const userName = req.payload.username;
+        if (!userName) {
+            return res
+                .status(402)
+                .json({ statusCode: 402, massage: "User not found !" })
+                .end();
+        }
+        try {
+            await this.repo.upDateUsername({
+                username: userName,
+                name: name,
+            });
+            return res
+                .status(200)
+                .json({ statusCode: 200, massage: `Update Name done` })
+                .end();
+        }
+        catch (err) {
+            console.error(err);
+            return res
+                .status(500)
+                .json({ statusCode: 500, massage: "Can't update", error: err })
                 .end();
         }
     }
