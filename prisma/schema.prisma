@@ -28,6 +28,7 @@ model content {
   videoTitle String
   creatorName String
   creatorUrl String
+  countView Int
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
   

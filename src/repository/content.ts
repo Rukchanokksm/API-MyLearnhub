@@ -22,19 +22,19 @@ class RepositoryContent implements IRepositoryContent {
                         username: true,
                         password: false,
                         name: true,
-                        registeredAt: true,
-                    },
-                },
+                        registeredAt: true
+                    }
+                }
             },
             data: {
                 ...arg,
                 ownerId: undefined,
                 postedBy: {
                     connect: {
-                        id: arg.ownerId,
-                    },
-                },
-            },
+                        id: arg.ownerId
+                    }
+                }
+            }
         });
     }
 
@@ -44,15 +44,15 @@ class RepositoryContent implements IRepositoryContent {
                 postedBy: {
                     select: {
                         id: true,
-                        username : true,
+                        username: true,
                         name: true,
                         registeredAt: true
                     }
                 }
             },
             where: {
-                id,
-            },
+                id
+            }
         });
     }
 
@@ -65,16 +65,16 @@ class RepositoryContent implements IRepositoryContent {
                         username: true,
                         password: false,
                         name: true,
-                        registeredAt: true,
-                    },
-                },
-            },
+                        registeredAt: true
+                    }
+                }
+            }
         });
     }
 
     async updateContentById(arg: IUpdateContent): Promise<IContent> {
         const post = await this.db.content.findUnique({
-            where: { id: arg.id },
+            where: { id: arg.id }
         });
         if (!post) {
             return Promise.reject(`no such post ${post}`);
@@ -84,20 +84,20 @@ class RepositoryContent implements IRepositoryContent {
         }
         return await this.db.content.update({
             where: {
-                id: arg.id,
+                id: arg.id
             },
             data: {
                 comment: arg.comment,
-                rating: arg.rating,
-            },
+                rating: arg.rating
+            }
         });
     }
 
     async deleteContentById(id: number): Promise<IContent> {
         return await this.db.content.delete({
             where: {
-                id,
-            },
+                id
+            }
         });
     }
 }

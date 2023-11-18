@@ -26,6 +26,7 @@ export interface ICreateContent {
     thumbnailUrl: string;
     creatorName: string;
     creatorUrl: string;
+    countView: number;
     ownerId?: string;
 }
 
@@ -38,6 +39,7 @@ export interface IUpdateContent {
     ownerId: string;
     comment?: string;
     rating?: number;
+    countView?: number;
 }
 
 export interface IUdateUserName {

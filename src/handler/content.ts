@@ -9,18 +9,21 @@ import { ReqDeleteId } from ".";
 interface IHandlerContent {
     createContentByid(
         req: JwtAuthReq<Empty, ReqContent>,
-        res: Response,
+        res: Response
     ): Promise<Response>;
     getPostContents(req: Request, res: Response): Promise<Response>;
     getPostContentById(
         req: JwtAuthReq<ReqId, Empty>,
-        res: Response,
-    ): Promise<Response> 
+        res: Response
+    ): Promise<Response>;
     updatePostContentById(
         req: JwtAuthReq<ReqId, ReqContent>,
-        res: Response,
+        res: Response
     ): Promise<Response>;
-    deleteContentById(req:JwtAuthReq<ReqId , Empty> , res :Response) : Promise<Response>
+    deleteContentById(
+        req: JwtAuthReq<ReqId, Empty>,
+        res: Response
+    ): Promise<Response>;
 }
 
 export function newHandlerContent(repo: IRepositoryContent) {
@@ -35,7 +38,7 @@ class HandlerContent implements IHandlerContent {
 
     async createContentByid(
         req: JwtAuthReq<Empty, ReqContent>,
-        res: Response,
+        res: Response
     ): Promise<Response> {
         const { videoUrl, comment, rating } = req.body;
         if (!videoUrl || !comment || !rating) {
@@ -49,11 +52,12 @@ class HandlerContent implements IHandlerContent {
             const contentVal = {
                 comment,
                 rating,
-                ownerId,
+                ownerId
             };
             const created: IContent = await this.repo.createContent({
                 ...contentVal,
                 ...Oemb,
+                countView: 0
             });
             return res
                 .status(201)
@@ -82,7 +86,7 @@ class HandlerContent implements IHandlerContent {
 
     async getPostContentById(
         req: JwtAuthReq<ReqId, Empty>,
-        res: Response,
+        res: Response
     ): Promise<Response> {
         const id = Number(req.params.id);
         if (isNaN(id)) {
@@ -104,7 +108,7 @@ class HandlerContent implements IHandlerContent {
 
     async updatePostContentById(
         req: JwtAuthReq<ReqId, ReqContent>,
-        res: Response,
+        res: Response
     ): Promise<Response> {
         const id = Number(req.params.id);
         if (isNaN(id)) {
@@ -114,6 +118,8 @@ class HandlerContent implements IHandlerContent {
                 .end();
         }
         const { comment, rating } = req.body;
+        let { countView } = req.body;
+
         if (!comment && !rating) {
             return res.status(500).json({ err: `Can update ` }).end();
         }
@@ -124,13 +130,23 @@ class HandlerContent implements IHandlerContent {
                 .end();
         }
         try {
+            //get current count view
+            const contentData = await this.repo.getContentById(id);
+            let isCount = 0;
+            if (countView && contentData?.countView) {
+                isCount = countView! + contentData?.countView!;
+            }
             const updateContent = await this.repo.updateContentById({
                 id,
                 ownerId: req.payload.id,
                 comment,
                 rating,
+                countView: isCount
             });
-            return res.status(200).json({massage :`Update Done ${updateContent}`}).end();
+            return res
+                .status(200)
+                .json({ massage: `Update Done ${updateContent}` })
+                .end();
         } catch (err) {
             return res
                 .status(500)
@@ -138,24 +154,38 @@ class HandlerContent implements IHandlerContent {
         }
     }
 
-    async deleteContentById(req:JwtAuthReq<ReqDeleteId , Empty> , res :Response) : Promise<Response> {
-        const id = Number(req.params.id)
-        if(isNaN(id)) {
-            return res.status(401).json({err : "Id is not a number"}).end()
+    async deleteContentById(
+        req: JwtAuthReq<ReqDeleteId, Empty>,
+        res: Response
+    ): Promise<Response> {
+        const id = Number(req.params.id);
+        if (isNaN(id)) {
+            return res.status(401).json({ err: "Id is not a number" }).end();
         }
-        try{
-            const owner = req.payload.id
-            const getId = await this.repo.getContentById(id)
-        if(!getId?.ownerId){
-    return res.status(400).json({err : `Not found content id ${id}`}).end()
-}
-            if(owner !== getId.ownerId){
-                return res.status(500).json({err : `Your not content onwer`}).end()
+        try {
+            const owner = req.payload.id;
+            const getId = await this.repo.getContentById(id);
+            if (!getId?.ownerId) {
+                return res
+                    .status(400)
+                    .json({ err: `Not found content id ${id}` })
+                    .end();
             }
-            await this.repo.deleteContentById(id)
-            return res.status(200).json({ massage : `delete complete`}).end()
-        }catch(err){
-            return res.status(500).json({err : `Can't delete content id is ${id} with error code ${err}`}).end()
+            if (owner !== getId.ownerId) {
+                return res
+                    .status(500)
+                    .json({ err: `Your not content onwer` })
+                    .end();
+            }
+            await this.repo.deleteContentById(id);
+            return res.status(200).json({ massage: `delete complete` }).end();
+        } catch (err) {
+            return res
+                .status(500)
+                .json({
+                    err: `Can't delete content id is ${id} with error code ${err}`
+                })
+                .end();
         }
     }
 }

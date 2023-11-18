@@ -16,6 +16,7 @@ export interface ReqContent {
     videoUrl: string;
     comment: string;
     rating: number;
+    countView?: number;
 }
 
 export interface Empty {}
